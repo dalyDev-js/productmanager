@@ -1,0 +1,181 @@
+ .addcontainer {
+    background-color: #52b788;
+    height: 90vh;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+   padding-top: 20px;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    a {
+      
+      text-decoration: none;
+     
+       
+      width: 55px;
+     
+      color: #000;
+      background: rgba(255, 255, 255, 0.31);
+      font-family: inherit;
+      padding: 0.6em 1.3em;
+      font-weight: 600;
+      font-size: 18px;
+      border: 3px solid #000;
+      border-radius: 0.4em;
+      box-shadow: 0.1em 0.1em;
+      
+     
+  }
+      a:hover {
+          transform: translate(-0.05em, -0.05em);
+          box-shadow: 0.15em 0.15em;
+  }
+  a:active {
+      transform: translate(0.05em, 0.05em);
+      box-shadow: 0.05em 0.05em;
+  }
+    
+ }
+ 
+
+ .card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 750px;
+    width: 600px;
+    background-color: #fff;
+    padding-top: 20px;
+    color: #081c15;
+    border: #000 2px solid;
+    border-radius: 20px;
+    transition: all 0.5s ease;
+    background: rgba(255, 255, 255, 0.31);
+border-radius: 16px;
+box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+backdrop-filter: blur(8.4px);
+-webkit-backdrop-filter: blur(8.4px);
+border: 0px solid rgba(255, 255, 255, 1);
+    border-radius: 20px;
+    -webkit-box-shadow: 0px 3px 12px -2px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 3px 12px -2px rgba(0,0,0,0.75);
+    box-shadow: 0px 3px 12px -2px rgba(0,0,0,0.75);
+    
+
+    
+ }
+ form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+     
+    
+ }
+ input {
+   width: 250px;
+     margin-bottom: 15px;
+     margin-top: 2px;
+    padding: 10px;
+    border: #2d6a4f 0px solid;
+    border-radius: 5px;
+    font-size: large;
+    color: #132a13 ;
+ }
+ input:focus {
+   outline: 3px solid #2d6a4f; /* Set the desired border color when the input is focused */
+ }
+ label {
+   font-size: 18px;
+   font-weight: 500;
+ }
+ select {
+  height: 35px;
+     width: 270px;
+    margin-bottom: 10px;
+    margin-top: 2px;
+    padding: 5px;
+    border: 0px solid;
+    border-radius: 5px;
+    font-size: large;
+ }
+ select:focus {
+   outline: 3px solid #2d6a4f; /* Set the desired border color when the input is focused */
+ }
+ 
+ 
+
+ .submit-btn {    
+    margin-bottom: 0 !important;                          
+    width: 130px;
+    background: #20BF55;
+    font-family: inherit;
+    padding: 0.6em 1.3em;
+    color: #000;
+    font-weight: 600;
+    font-size: 18px;
+    border: 3px solid #132a13;
+    border-radius: 0.4em;
+    box-shadow: 0.1em 0.1em #132a13;
+    cursor: pointer;
+    margin-top: 30px;
+ 
+}
+
+.submit-btn:hover {
+   transform: translate(-0.05em, -0.05em);
+   box-shadow: 0.15em 0.15em #132a13;
+ }
+ 
+ .submit-btn:active {
+   transform: translate(0.05em, 0.05em);
+   box-shadow: 0.05em 0.05em #132a13;
+ }
+
+ .submit-btn:hover {
+   transform: translate(-0.05em, -0.05em);
+   box-shadow: 0.15em 0.15em #132a13;
+ }
+ 
+ .submit-btn:active {
+   transform: translate(0.05em, 0.05em);
+   box-shadow: 0.05em 0.05em #000;
+ }
+ .lables {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+ }
+
+.error-message {
+   color: #bf0603;
+   padding-bottom: 20px;
+   font-weight: 600;
+   margin: 0;
+   font-size: 18px;
+}
+.buttonsA {
+   margin-top: 20px;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   gap: 20px;
+}
+
+ 
+
+
+.addheader{
+  display: flex;
+  justify-content: flex-start;
+  align-items: center; 
+  gap: 20px;
+
+}
+.void {
+  background-color: #fff;
+ 
+  
+ }

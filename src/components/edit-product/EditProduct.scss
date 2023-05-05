@@ -1,0 +1,40 @@
+.editcontainer {
+    background-color: #ced4da;
+    height: 90vh;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+   padding-top: 20px;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    a {
+      
+      
+        text-decoration: none;
+       width: 55px;
+         
+        color: #081c15;
+        background: rgba(255, 255, 255, 0.31);
+        font-family: inherit;
+         
+        font-weight: 600;
+        font-size: 18px;
+        border: 3px solid #081c15;
+        border-radius: 0.4em;
+        box-shadow: 0.1em 0.1em;
+        
+}}
+
+.editheader{
+  display: flex;
+  justify-content: flex-start;
+  align-items: center; 
+  gap: 20px;
+
+}
+.void {
+  background-color: #fff;
+ 
+  
+ }
