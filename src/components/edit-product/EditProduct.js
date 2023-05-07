@@ -37,7 +37,7 @@ function EditProducts() {
   }, []);
   function getUsers() {
     axios
-      .get(`http://productsmap.atwebpages.com/api/products/${SKU}`)
+      .get(`https://productsstestss.000webhostapp.com/api/products/${SKU}`)
       .then(function (response) {
         console.log(response.data);
         setInputs(response.data);
@@ -104,7 +104,10 @@ function EditProducts() {
     event.preventDefault();
 
     axios
-      .put(`http://productsmap.atwebpages.com/api/product/${SKU}/edit`, inputs)
+      .put(
+        `https://productsstestss.000webhostapp.com/api/product/${SKU}/edit`,
+        inputs
+      )
       .then(function (response) {
         console.log(response.data);
 

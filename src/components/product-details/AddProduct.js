@@ -17,7 +17,7 @@ function AddProducts() {
     { value: "Book", label: "Book", inputLabel: "Weight (KG)", id: "Book" },
   ];
   const [inputs, setInputs] = useState({
-    SKU: "",
+    sku: "",
     name: "",
     price: "",
     attribute: "",
@@ -60,47 +60,94 @@ function AddProducts() {
 
   //handle submit
   const Navigate = useNavigate();
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    axios
-      .post("http://productsmap.atwebpages.com/api/product/save", inputs)
-      .then(function (response) {
-        console.log(response.data);
-
-        // clear inputs if success
-        if (
-          JSON.stringify(response.data) ===
-          JSON.stringify({ status: 1, message: "Data created." })
-        ) {
-          setInputs({
-            SKU: "",
-            name: "",
-            price: "",
-            attribute: "",
-            value: "",
-            height: "",
-            width: "",
-            length: "",
-            weight: "",
-            size: "",
-          });
-          Navigate("/");
-        }
-        // if SKU already exist
-        if (
-          typeof response.data === "string" &&
-          (response.data.includes(
-            "Integrity constraint violation: 1048 Column 'SKU' cannot be null"
-          ) ||
-            response.data.includes(
-              "Integrity constraint violation: 1062 Duplicate entry"
-            ))
-        ) {
-          setErrorMessage("SKU already exists!");
-        } else {
-          setErrorMessage("");
-        }
+    fetch("https://unideal-reactor.000webhostapp.com/api/product/save", {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sku: inputs.sku,
+        name: inputs.name,
+        price: inputs.price,
+        attribute: inputs.attribute,
+        value: inputs.value,
+      }),
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.error(error);
       });
+
+    // const config = {
+    //   method: "post",
+    //   url: "https://unideal-reactor.000webhostapp.com/api/product/save",
+    //   headers: {
+    //     "Access-Control-Allow-Origin": "*",
+    //     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    //     "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    //     "Content-Type": "application/json"
+    //   },
+    //   data: {
+    //     sku: inputs.sku,
+    //     name: inputs.name,
+    //     price: inputs.price,
+    //     attribute: inputs.attribute,
+    //     value: inputs.value,
+    //   },
+    // };
+    // axios(config)
+    //   .then(function (response) {
+    //     console.log(response.config);
+    //     console.log(response.data);
+
+    //     // clear inputs if success
+    //     if (
+    //       JSON.stringify(response.data) ===
+    //       JSON.stringify({ status: 1, message: "Data created." })
+    //     ) {
+    //       setInputs({
+    //         sku: "",
+    //         name: "",
+    //         price: "",
+    //         attribute: "",
+    //         value: "",
+    //         height: "",
+    //         width: "",
+    //         length: "",
+    //         weight: "",
+    //         size: "",
+    //       });
+    //       Navigate("/");
+    //     }
+    //     // if SKU already exist
+    //     if (
+    //       typeof response.data === "string" &&
+    //       (response.data.includes(
+    //         "Integrity constraint violation: 1048 Column 'SKU' cannot be null"
+    //       ) ||
+    //         response.data.includes(
+    //           "Integrity constraint violation: 1062 Duplicate entry"
+    //         ))
+    //     ) {
+    //       setErrorMessage("SKU already exists!");
+    //     } else {
+    //       setErrorMessage("");
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     console.log(err.config);
+    //     console.log(err);
+    //   });
   };
 
   return (
@@ -113,7 +160,7 @@ function AddProducts() {
           />
         </div>
         <h1 className="void">|</h1>
-        <h1>Add Product {inputs.SKU}</h1>
+        <h1>Add Product {inputs.sku}</h1>
       </header>
       <div className="addcontainer">
         <div className="card">
@@ -123,9 +170,9 @@ function AddProducts() {
               <input
                 id="sku"
                 type="text"
-                name="SKU"
+                name="sku"
                 placeholder=""
-                value={inputs.SKU}
+                value={inputs.sku}
                 onChange={handleChange}
                 required
               />
@@ -172,7 +219,7 @@ function AddProducts() {
                   <option
                     name="attribute"
                     id={option.id}
-                    key={option.value}
+                    key={option.id}
                     value={option.value}
                   >
                     {option.label}

@@ -15,7 +15,7 @@ function ProductList() {
 
   function getUsers() {
     axios
-      .get("http://productsmap.atwebpages.com/api/products")
+      .get("https://unideal-reactor.000webhostapp.com/api/products")
       .then(function (response) {
         console.log(response.data);
         setProducts(response.data);
@@ -25,7 +25,7 @@ function ProductList() {
   const deleteProducts = (SKUsToDelete) => {
     const deletePromises = SKUsToDelete.map((SKU) =>
       axios.delete(
-        `http://productsmap.atwebpages.com/api/product/${SKU}/delete`
+        `https://productsstestss.000webhostapp.com/api/product/${SKU}/delete`
       )
     );
 
@@ -53,7 +53,9 @@ function ProductList() {
 
   const deleteProduct = (SKU) => {
     axios
-      .delete(`http://productsmap.atwebpages.com/api/product/${SKU}/delete`)
+      .delete(
+        `https://productsstestss.000webhostapp.com/api/product/${SKU}/delete`
+      )
       .then(function (response) {
         console.log(response.data);
         getUsers();
