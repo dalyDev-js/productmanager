@@ -36,10 +36,11 @@ function EditProduct() {
   }, []);
   function getProduct() {
     axios.get(`http://localhost/api/product/${sku}`).then(function (response) {
-      console.log(response.data);
       setInputs(response.data);
       setAttributeInput(response.data.attribute);
       setSelectedOption(response.data.attribute);
+      console.log('yes');
+  console.log(response);
       if (response.data.attribute === "Furniture") {
         const dimensions = response.data.value.split("x");
         if (dimensions.length === 3) {
@@ -51,10 +52,14 @@ function EditProduct() {
           }));
         }
       } else if (response.data.attribute === "DVD-Disk") {
-        // setInputs((values) => ({
-        //   ...values,
-        //   // size: response.data.value,
-        // }));
+        setInputs((values) => ({
+            ...values,
+            sku: response.data.sku,
+            name: response.data.name,
+            price: response.data.price,
+            attribute: response.data.attribute,
+            value: response.data.value,
+        }));
       } else if (response.data.attribute === "Book") {
         setInputs((values) => ({
           ...values,
