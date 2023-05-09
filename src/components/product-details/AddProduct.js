@@ -62,92 +62,62 @@ function AddProducts() {
   const Navigate = useNavigate();
   const handleSubmit = async (event) => {
     event.preventDefault();
-    fetch("https://unideal-reactor.000webhostapp.com/api/product/save", {
-      method: "POST",
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+
+    const config = {
+      method: "post",
+      url: "http://localhost/api/product/save",
+
+      data: {
         sku: inputs.sku,
         name: inputs.name,
         price: inputs.price,
         attribute: inputs.attribute,
         value: inputs.value,
-      }),
-    })
-      .then((response) => {
-        return response.json();
+      },
+    };
+    axios(config)
+      .then(function (response) {
+        console.log(response.config);
+        console.log(response.data);
+
+        // clear inputs if success
+        if (
+          JSON.stringify(response.data) ===
+          JSON.stringify({ status: 1, message: "Data created." })
+        ) {
+          setInputs({
+            sku: "",
+            name: "",
+            price: "",
+            attribute: "",
+            value: "",
+            height: "",
+            width: "",
+            length: "",
+            weight: "",
+            size: "",
+          });
+          Navigate("/");
+        }
+        // if SKU already exist
+        if (
+          typeof response.data === "string" &&
+          (response.data.includes(
+            "Integrity constraint violation: 1048 Column 'SKU' cannot be null"
+          ) ||
+            response.data.includes(
+              "Integrity constraint violation: 1062 Duplicate entry"
+            ))
+        ) {
+          setErrorMessage("SKU already exists!");
+        } else {
+          setErrorMessage("");
+        }
       })
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((error) => {
-        console.error(error);
+      .catch((err) => {
+        console.log(err.config);
+        console.log(err);
       });
-
-    // const config = {
-    //   method: "post",
-    //   url: "https://unideal-reactor.000webhostapp.com/api/product/save",
-    //   headers: {
-    //     "Access-Control-Allow-Origin": "*",
-    //     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    //     "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    //     "Content-Type": "application/json"
-    //   },
-    //   data: {
-    //     sku: inputs.sku,
-    //     name: inputs.name,
-    //     price: inputs.price,
-    //     attribute: inputs.attribute,
-    //     value: inputs.value,
-    //   },
-    // };
-    // axios(config)
-    //   .then(function (response) {
-    //     console.log(response.config);
-    //     console.log(response.data);
-
-    //     // clear inputs if success
-    //     if (
-    //       JSON.stringify(response.data) ===
-    //       JSON.stringify({ status: 1, message: "Data created." })
-    //     ) {
-    //       setInputs({
-    //         sku: "",
-    //         name: "",
-    //         price: "",
-    //         attribute: "",
-    //         value: "",
-    //         height: "",
-    //         width: "",
-    //         length: "",
-    //         weight: "",
-    //         size: "",
-    //       });
-    //       Navigate("/");
-    //     }
-    //     // if SKU already exist
-    //     if (
-    //       typeof response.data === "string" &&
-    //       (response.data.includes(
-    //         "Integrity constraint violation: 1048 Column 'SKU' cannot be null"
-    //       ) ||
-    //         response.data.includes(
-    //           "Integrity constraint violation: 1062 Duplicate entry"
-    //         ))
-    //     ) {
-    //       setErrorMessage("SKU already exists!");
-    //     } else {
-    //       setErrorMessage("");
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     console.log(err.config);
-    //     console.log(err);
-    //   });
   };
 
   return (

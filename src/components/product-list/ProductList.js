@@ -14,19 +14,15 @@ function ProductList() {
   }, []);
 
   function getUsers() {
-    axios
-      .get("https://unideal-reactor.000webhostapp.com/api/products")
-      .then(function (response) {
-        console.log(response.data);
-        setProducts(response.data);
-      });
+    axios.get("http://localhost/api/products").then(function (response) {
+      console.log(response.data);
+      setProducts(response.data);
+    });
   }
 
   const deleteProducts = (SKUsToDelete) => {
-    const deletePromises = SKUsToDelete.map((SKU) =>
-      axios.delete(
-        `https://productsstestss.000webhostapp.com/api/product/${SKU}/delete`
-      )
+    const deletePromises = SKUsToDelete.map((sku) =>
+      axios.delete(`http://localhost/api/product/${sku}/delete`)
     );
 
     Promise.all(deletePromises).then(function (responses) {
@@ -37,13 +33,13 @@ function ProductList() {
 
   const handleDeleteChecked = () => {
     const checkedProducts = products.filter((product) => product.checked);
-    const SKUsToDelete = checkedProducts.map((product) => product.SKU);
+    const SKUsToDelete = checkedProducts.map((product) => product.sku);
     deleteProducts(SKUsToDelete);
   };
 
-  const handleCheckboxChange = (event, SKU) => {
+  const handleCheckboxChange = (event, sku) => {
     const updatedProducts = products.map((product) => {
-      if (product.SKU === SKU) {
+      if (product.sku === sku) {
         return { ...product, checked: event.target.checked };
       }
       return product;
@@ -51,11 +47,9 @@ function ProductList() {
     setProducts(updatedProducts);
   };
 
-  const deleteProduct = (SKU) => {
+  const deleteProduct = (sku) => {
     axios
-      .delete(
-        `https://productsstestss.000webhostapp.com/api/product/${SKU}/delete`
-      )
+      .delete(`http://localhost/api/product/${sku}/delete`)
       .then(function (response) {
         console.log(response.data);
         getUsers();
@@ -110,19 +104,19 @@ function ProductList() {
                 type="checkbox"
                 id={`cbx-${key}`}
                 checked={product.checked || false}
-                onChange={(event) => handleCheckboxChange(event, product.SKU)}
+                onChange={(event) => handleCheckboxChange(event, product.sku)}
               />
               <label htmlFor={`cbx-${key}`} className="cbx" />
 
-              <p>{product.SKU}</p>
+              <p>{product.sku}</p>
               <p>Product: {product.name}</p>
               <p>Price: {product.price} $</p>
               <p>{getDescription(product)}</p>
               <div className="edit-delete">
-                <Link to={`edit-product/${product.SKU}`}>
+                <Link to={`edit-product/${product.sku}`}>
                   <AiFillEdit /> Edit
                 </Link>
-                <button onClick={() => deleteProduct(product.SKU)}>
+                <button onClick={() => deleteProduct(product.sku)}>
                   {" "}
                   <FaTrash />
                   Delete

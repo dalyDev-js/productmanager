@@ -1,14 +1,13 @@
-import React from "react";
-
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./EditProduct.scss";
 import { BiArrowBack } from "react-icons/bi";
 import { AiFillEdit } from "react-icons/ai";
 
-function EditProducts() {
+function EditProduct() {
   //states
+
   const selectedOptions = [
     { value: "DVD-Disk", label: "DVD", inputLabel: "Size (MB)", id: "DVD" },
     {
@@ -20,51 +19,49 @@ function EditProducts() {
     { value: "Book", label: "Book", inputLabel: "Weight (KG)", id: "Book" },
   ];
   const [inputs, setInputs] = useState({
-    SKU: "",
+    sku: "",
     name: "",
     price: "",
     attribute: "",
     value: "",
   });
+
   const [selectedOption, setSelectedOption] = useState("");
   const [attributeInput, setAttributeInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const { SKU } = useParams();
-
-  //get users once
+  const { sku } = useParams();
+  //get product once
   useEffect(() => {
-    getUsers();
+    getProduct();
   }, []);
-  function getUsers() {
-    axios
-      .get(`https://productsstestss.000webhostapp.com/api/products/${SKU}`)
-      .then(function (response) {
-        console.log(response.data);
-        setInputs(response.data);
-        setAttributeInput(response.data.attribute);
-        setSelectedOption(response.data.attribute);
-        if (response.data.attribute === "Furniture") {
-          const dimensions = response.data.value.split("x");
-          if (dimensions.length === 3) {
-            setInputs((values) => ({
-              ...values,
-              height: dimensions[0],
-              width: dimensions[1],
-              length: dimensions[2],
-            }));
-          }
-        } else if (response.data.attribute === "DVD-Disk") {
+  function getProduct() {
+    axios.get(`http://localhost/api/product/${sku}`).then(function (response) {
+      console.log(response.data);
+      setInputs(response.data);
+      setAttributeInput(response.data.attribute);
+      setSelectedOption(response.data.attribute);
+      if (response.data.attribute === "Furniture") {
+        const dimensions = response.data.value.split("x");
+        if (dimensions.length === 3) {
           setInputs((values) => ({
             ...values,
-            size: response.data.value,
-          }));
-        } else if (response.data.attribute === "Book") {
-          setInputs((values) => ({
-            ...values,
-            weight: response.data.value,
+            height: dimensions[0],
+            width: dimensions[1],
+            length: dimensions[2],
           }));
         }
-      });
+      } else if (response.data.attribute === "DVD-Disk") {
+        // setInputs((values) => ({
+        //   ...values,
+        //   // size: response.data.value,
+        // }));
+      } else if (response.data.attribute === "Book") {
+        setInputs((values) => ({
+          ...values,
+          weight: response.data.value,
+        }));
+      }
+    });
   }
 
   //change handler
@@ -102,12 +99,9 @@ function EditProducts() {
   const Navigate = useNavigate();
   const handleSubmit = (event) => {
     event.preventDefault();
-
+    console.log(inputs);
     axios
-      .put(
-        `https://productsstestss.000webhostapp.com/api/product/${SKU}/edit`,
-        inputs
-      )
+      .put(`http://localhost/api/product/${sku}/edit`, inputs)
       .then(function (response) {
         console.log(response.data);
 
@@ -117,7 +111,7 @@ function EditProducts() {
           JSON.stringify({ status: 1, message: "Data updated." })
         ) {
           setInputs({
-            SKU: "",
+            sku: "",
             name: "",
             price: "",
             attribute: "",
@@ -126,8 +120,9 @@ function EditProducts() {
             width: "",
             length: "",
             weight: "",
-            size: "",
+            // size: "",
           });
+
           Navigate("/");
         }
       });
@@ -146,7 +141,7 @@ function EditProducts() {
         <h1>
           {" "}
           <AiFillEdit />
-          Edit Product : {inputs.SKU}
+          Edit Product : {inputs.sku}
         </h1>
       </header>
       <div className="editcontainer">
@@ -157,9 +152,9 @@ function EditProducts() {
               <input
                 id="sku"
                 type="text"
-                name="SKU"
+                name="sku"
                 placeholder=""
-                value={inputs.SKU}
+                value={inputs.sku}
                 onChange={handleChange}
                 required
               />
@@ -281,7 +276,7 @@ function EditProducts() {
                     id="size"
                     type="number"
                     name="size"
-                    value={inputs.size}
+                    value={inputs.value}
                     placeholder=""
                     onChange={handleChange}
                   />
@@ -309,4 +304,4 @@ function EditProducts() {
   );
 }
 
-export default EditProducts;
+export default EditProduct;
