@@ -59,6 +59,7 @@ function ProductList() {
         getUsers();
       });
   };
+
   const getDescription = (product) => {
     if (product.attribute === "Furniture") {
       return "Dimensions: " + product.value + ` CM`;
