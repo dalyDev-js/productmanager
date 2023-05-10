@@ -14,7 +14,7 @@ function ProductList() {
   }, []);
 
   function getUsers() {
-    axios.get("http://localhost/api/products").then(function (response) {
+    axios.get("https://www.screen2script-mag.com/api/products").then(function (response) {
       console.log(response.data);
       setProducts(response.data);
     });
@@ -22,7 +22,7 @@ function ProductList() {
 
   const deleteProducts = (SKUsToDelete) => {
     const deletePromises = SKUsToDelete.map((sku) =>
-      axios.delete(`http://localhost/api/product/${sku}/delete`)
+      axios.delete(`https://www.screen2script-mag.com/api/product/${sku}/delete`)
     );
 
     Promise.all(deletePromises).then(function (responses) {
@@ -49,7 +49,7 @@ function ProductList() {
 
   const deleteProduct = (sku) => {
     axios
-      .delete(`http://localhost/api/product/${sku}/delete`)
+      .delete(`https://www.screen2script-mag.com/api/product/${sku}/delete`)
       .then(function (response) {
         console.log(response.data);
         getUsers();
