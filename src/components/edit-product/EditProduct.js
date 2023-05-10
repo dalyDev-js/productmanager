@@ -297,7 +297,7 @@ function EditProduct() {
         <h1>
           {" "}
           <AiFillEdit />
-          {/* Edit Product : {inputs.sku} */}
+          Edit Product : {inputs.sku}
         </h1>
       </header>
       <div className="editcontainer">
@@ -312,6 +312,9 @@ function EditProduct() {
                 placeholder=""
                 value={inputs.sku}
                 onChange={handleChange}
+                onKeyDown={(e) => {
+                  if (e.key === " " || e.key === "Spacebar") e.preventDefault();
+                }}
                 required
               />
               {errorMessage && (
