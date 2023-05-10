@@ -99,20 +99,10 @@ function AddProducts() {
 
     if (!inputs.sku.trim()) {
       errorMessages.sku = "Please provide SKU";
-    } else if (inputs.sku !== inputs.sku.toLowerCase()) {
-      setInputs((prevInputs) => ({
-        ...prevInputs,
-        sku: inputs.sku.toLowerCase(),
-      }));
     }
 
     if (!inputs.name.trim()) {
       errorMessages.name = "Please provide Name";
-    } else if (/\d/.test(inputs.name)) {
-      setInputs((prevInputs) => ({
-        ...prevInputs,
-        name: inputs.name.replace(/\d/g, ""),
-      }));
     }
 
     if (!inputs.price.trim()) {
@@ -216,14 +206,6 @@ function AddProducts() {
           console.log(err);
         });
     }
-    if (!inputs.sku.trim()) {
-      errorMessages.sku = "Please provide SKU";
-    } else if (inputs.sku !== inputs.sku.toLowerCase()) {
-      setInputs((prevInputs) => ({
-        ...prevInputs,
-        sku: inputs.sku.toLowerCase(),
-      }));
-    }
   };
   return (
     <>
@@ -250,8 +232,14 @@ function AddProducts() {
                 value={inputs.sku}
                 onChange={handleChange}
                 onKeyDown={(e) => {
-                  if (e.key === " " || e.key === "Spacebar") {
-                    e.preventDefault();
+                  if (
+                    (e.key === " " ||
+                      e.key === "Spacebar" ||
+                      e.key.match(/[A-Z!@#$%^&*()+\-=_]/)) &&
+                    e.key !== "Backspace" &&
+                    e.key !== "Delete"
+                  ) {
+                    e.preventDefault( );
                   }
                 }}
               />
