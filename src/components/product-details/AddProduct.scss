@@ -1,6 +1,6 @@
  .addcontainer {
     background-color: #52b788;
-    height: 90vh;
+    height: 120vh;
     width: 100%;
     display: flex;
     justify-content: flex-start;
@@ -8,6 +8,14 @@
     align-items: center;
     flex-direction: column;
     gap: 20px;
+.error-message {
+  font-size: 18px;
+  color: #d90429;
+  font-weight: 500;
+   
+  
+}
+    
     a {
       
       text-decoration: none;
@@ -71,13 +79,12 @@ border: 0px solid rgba(255, 255, 255, 1);
     align-items: center;
     flex-direction: column;
      
+     
     
  }
  input {
    width: 250px;
-     margin-bottom: 15px;
-     margin-top: 2px;
-    padding: 10px;
+    padding: 6px;
     border: #2d6a4f 0px solid;
     border-radius: 5px;
     font-size: large;
@@ -86,6 +93,8 @@ border: 0px solid rgba(255, 255, 255, 1);
  input:focus {
    outline: 3px solid #2d6a4f; /* Set the desired border color when the input is focused */
  }
+ 
+
  label {
    font-size: 18px;
    font-weight: 500;
@@ -93,9 +102,9 @@ border: 0px solid rgba(255, 255, 255, 1);
  select {
   height: 35px;
      width: 270px;
-    margin-bottom: 10px;
-    margin-top: 2px;
-    padding: 5px;
+     
+     
+    padding: 6px;
     border: 0px solid;
     border-radius: 5px;
     font-size: large;
@@ -147,11 +156,12 @@ border: 0px solid rgba(255, 255, 255, 1);
     justify-content: center;
     align-items: flex-start;
     flex-direction: column;
+    margin-bottom: 20px;
  }
 
 .error-message {
    color: #bf0603;
-   padding-bottom: 20px;
+   padding-bottom: 10px;
    font-weight: 600;
    margin: 0;
    font-size: 18px;
@@ -178,4 +188,8 @@ border: 0px solid rgba(255, 255, 255, 1);
   background-color: #fff;
  
   
+ }
+
+ .format-text{
+  margin-top: 20px;
  }
