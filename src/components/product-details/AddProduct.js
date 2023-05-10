@@ -65,7 +65,7 @@ function AddProducts() {
 
     const config = {
       method: "post",
-      url: "http://localhost/api/product/save",
+      url: "https://www.screen2script-mag.com/api/product/save",
 
       data: {
         sku: inputs.sku,
