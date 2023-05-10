@@ -6,8 +6,6 @@ import { BiArrowBack } from "react-icons/bi";
 import { AiFillEdit } from "react-icons/ai";
 
 function EditProduct() {
-  //states
-
   const selectedOptions = [
     { value: "DVD-Disk", label: "DVD", inputLabel: "Size (MB)", id: "DVD" },
     {
@@ -24,58 +22,109 @@ function EditProduct() {
     price: "",
     attribute: "",
     value: "",
+    width: "",
+    height: "",
+    length: "",
+    weight: "",
+    size: "",
+  });
+  const [selectedOption, setSelectedOption] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [attributeInput, setAttributeInput] = useState("");
+  const [errorMessages, setErrorMessages] = useState({
+    sku: "",
+    name: "",
+    price: "",
+    attribute: "",
+    value: "",
+    height: "",
+    width: "",
+    length: "",
+    weight: "",
+    size: "",
   });
 
-  const [selectedOption, setSelectedOption] = useState("");
-  const [attributeInput, setAttributeInput] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const { sku } = useParams();
-  //get product once
   useEffect(() => {
     getProduct();
   }, []);
+  const { sku } = useParams();
+
   function getProduct() {
-    axios.get(`https://www.screen2script-mag.com/api/product/${sku}`).then(function (response) {
-      setInputs(response.data);
-      setAttributeInput(response.data.attribute);
-      setSelectedOption(response.data.attribute);
-      console.log('yes');
-  console.log(response);
-      if (response.data.attribute === "Furniture") {
-        const dimensions = response.data.value.split("x");
-        if (dimensions.length === 3) {
+    axios
+      .get(`https://www.screen2script-mag.com/api/products/${sku}`)
+      .then(function (response) {
+        console.log(response.data);
+        setInputs(response.data);
+        setAttributeInput(response.data.attribute);
+        setSelectedOption(response.data.attribute);
+
+        if (response.data.attribute === "Furniture") {
+          const dimensions = response.data.value.split("x");
+          if (dimensions.length === 3) {
+            setInputs((values) => ({
+              ...values,
+              height: dimensions[0],
+              width: dimensions[1],
+              length: dimensions[2],
+              value: response.data.value, // Set value to the original value
+            }));
+          }
+        } else if (response.data.attribute === "DVD-Disk") {
           setInputs((values) => ({
             ...values,
-            height: dimensions[0],
-            width: dimensions[1],
-            length: dimensions[2],
+            size: response.data.value,
+            value: response.data.value, // Set value to the original value
+          }));
+        } else if (response.data.attribute === "Book") {
+          setInputs((values) => ({
+            ...values,
+            weight: response.data.value,
+            value: response.data.value, // Set value to the original value
           }));
         }
-      } else if (response.data.attribute === "DVD-Disk") {
-        setInputs((values) => ({
-            ...values,
-            sku: response.data.sku,
-            name: response.data.name,
-            price: response.data.price,
-            attribute: response.data.attribute,
-            value: response.data.value,
-        }));
-      } else if (response.data.attribute === "Book") {
-        setInputs((values) => ({
-          ...values,
-          weight: response.data.value,
-        }));
-      }
-    });
+      });
   }
-
-  //change handler
+  //CHANGE HANDLE
   const handleChange = (event) => {
     const name = event.target.name;
     const value = event.target.value;
-    setInputs((values) => ({ ...values, [name]: value }));
 
-    if (selectedOption === "Furniture") {
+    setInputs((prevInputs) => ({
+      ...prevInputs,
+      [name]: value,
+    }));
+
+    setErrorMessages((prevErrorMessages) => ({
+      ...prevErrorMessages,
+      [name]: "",
+    }));
+
+    if (name === "attribute") {
+      setSelectedOption(value); // Update the selected option
+
+      if (value === "Book") {
+        setInputs((prevInputs) => ({
+          ...prevInputs,
+          value: prevInputs.weight, // Set the value to weight
+        }));
+      } else if (value === "DVD-Disk") {
+        setInputs((values) => ({
+          ...values,
+          value: values.size, // Set the value to size
+        }));
+      } else {
+        setInputs((values) => ({
+          ...values,
+          value: "", // Clear the value
+        }));
+      }
+    }
+
+    // Update dimensions for Furniture
+    if (
+      (name === "height" || name === "width" || name === "length") &&
+      selectedOption === "Furniture"
+    ) {
       const dimensions = ["height", "width", "length"];
       const updatedValues = dimensions.reduce((acc, dimension) => {
         if (name === dimension) {
@@ -88,49 +137,151 @@ function EditProduct() {
         (dimension) => updatedValues[dimension]
       );
       const formattedValue = dimensionValues.join("x");
-
       setInputs((values) => ({ ...values, value: formattedValue }));
-    } else if (selectedOption === "DVD-Disk" || selectedOption === "Book") {
-      setInputs((values) => ({ ...values, value: value }));
+    }
+
+    // Update value for DVD-Disk
+    if (name === "size" && selectedOption === "DVD-Disk") {
+      setInputs((values) => ({
+        ...values,
+        value: value,
+      }));
+    }
+    // Update value for Book
+    if (name === "weight" && selectedOption === "Book") {
+      setInputs((prevInputs) => ({
+        ...prevInputs,
+        value: value,
+      }));
     }
   };
+
+  // handle option change
   const handleOptionChange = (event) => {
     const name = event.target.name;
     const option = event.target.value;
     setSelectedOption(option);
     setInputs((values) => ({ ...values, [name]: option }));
+    setErrorMessages((messages) => ({ ...messages, [name]: "" }));
   };
-  // handle submit
-  const Navigate = useNavigate();
-  const handleSubmit = (event) => {
+
+  //handle submit
+  const navigate = useNavigate();
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(inputs);
-    axios
-      .put(`https://www.screen2script-mag.com/api/product/${sku}/edit`, inputs)
-      .then(function (response) {
-        console.log(response.data);
 
-        // clear inputs if success
-        if (
-          JSON.stringify(response.data) ===
-          JSON.stringify({ status: 1, message: "Data updated." })
-        ) {
-          setInputs({
-            sku: "",
-            name: "",
-            price: "",
-            attribute: "",
-            value: "",
-            height: "",
-            width: "",
-            length: "",
-            weight: "",
-            // size: "",
-          });
+    // Input validation
+    const errorMessages = {};
 
-          Navigate("/");
-        }
-      });
+    if (!inputs.sku.trim()) {
+      errorMessages.sku = "Please provide SKU";
+    }
+
+    if (!inputs.name.trim()) {
+      errorMessages.name = "Please provide Name";
+    }
+
+    if (!inputs.price.trim()) {
+      errorMessages.price = "Please provide Price";
+    }
+
+    if (!inputs.attribute) {
+      errorMessages.attribute = "Please select a Type";
+    } else {
+      switch (selectedOption) {
+        case "Furniture":
+          if (!inputs.height.trim()) {
+            errorMessages.height = "Please provide Height";
+          }
+          if (!inputs.width.trim()) {
+            errorMessages.width = "Please provide Width";
+          }
+          if (!inputs.length.trim()) {
+            errorMessages.length = "Please provide Length";
+          }
+          break;
+
+        case "Book":
+          if (!inputs.weight.trim()) {
+            errorMessages.value = "Please provide weight in KG";
+          }
+          break;
+
+        case "DVD-Disk":
+          if (!inputs.size.trim()) {
+            errorMessages.value = "Please provide Size in MB";
+          }
+          break;
+
+        default:
+          break;
+      }
+    }
+    setErrorMessages(errorMessages);
+
+    // Check if there are any error messages
+    const hasErrors = Object.values(errorMessages).some(
+      (message) => message !== ""
+    );
+
+    if (!hasErrors) {
+      const config = {
+        method: "put",
+        url: `https://www.screen2script-mag.com/api/product/${sku}/edit`,
+        data: {
+          sku: inputs.sku,
+          name: inputs.name,
+          price: inputs.price,
+          attribute: inputs.attribute,
+          value: inputs.value,
+        },
+      };
+
+      axios(config)
+        .then(function (response) {
+          console.log(response.config);
+          console.log(response.data);
+
+          // clear inputs if success
+          if (
+            JSON.stringify(response.data) ===
+            JSON.stringify({ status: 1, message: "Data updated." })
+          ) {
+            setInputs({
+              sku: "",
+              name: "",
+              price: "",
+              attribute: "",
+              value: "",
+              height: "",
+              width: "",
+              length: "",
+              weight: "",
+              size: "",
+            });
+            navigate("/");
+          }
+
+          // if SKU already exists
+          if (
+            typeof response.data === "string" &&
+            (response.data.includes(
+              "Integrity constraint violation: 1048 Column 'SKU' cannot be null"
+            ) ||
+              response.data.includes(
+                "Integrity constraint violation: 1062 Duplicate entry"
+              ))
+          ) {
+            setErrorMessage("SKU already exists!");
+          } else {
+            setErrorMessage("");
+          }
+        })
+        .catch((err) => {
+          console.log(err.config);
+          console.log(err);
+        });
+    }
   };
 
   return (
@@ -146,7 +297,7 @@ function EditProduct() {
         <h1>
           {" "}
           <AiFillEdit />
-          Edit Product : {inputs.sku}
+          {/* Edit Product : {inputs.sku} */}
         </h1>
       </header>
       <div className="editcontainer">
@@ -277,14 +428,16 @@ function EditProduct() {
                 <div className="lables">
                   <label>Size (MB)</label>
                   <input
-                    required
                     id="size"
                     type="number"
                     name="size"
-                    value={inputs.value}
+                    value={inputs.size}
                     placeholder=""
                     onChange={handleChange}
                   />
+                  {errorMessages.value && (
+                    <span className="error-message">{errorMessages.value}</span>
+                  )}
                 </div>
                 <span>Please provide Size in Mb</span>
               </>
