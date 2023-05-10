@@ -14,15 +14,19 @@ function ProductList() {
   }, []);
 
   function getUsers() {
-    axios.get("https://www.screen2script-mag.com/api/products").then(function (response) {
-      console.log(response.data);
-      setProducts(response.data);
-    });
+    axios
+      .get("https://www.screen2script-mag.com/api/products")
+      .then(function (response) {
+        console.log(response.data);
+        setProducts(response.data);
+      });
   }
 
   const deleteProducts = (SKUsToDelete) => {
     const deletePromises = SKUsToDelete.map((sku) =>
-      axios.delete(`https://www.screen2script-mag.com/api/product/${sku}/delete`)
+      axios.delete(
+        `https://www.screen2script-mag.com/api/product/${sku}/delete`
+      )
     );
 
     Promise.all(deletePromises).then(function (responses) {
@@ -57,7 +61,7 @@ function ProductList() {
   };
   const getDescription = (product) => {
     if (product.attribute === "Furniture") {
-      return "Dimensions: " + product.value;
+      return "Dimensions: " + product.value + ` CM`;
     } else if (product.attribute === "DVD-Disk") {
       return "Size: " + product.value + " MB";
     } else if (product.attribute === "Book") {
@@ -109,7 +113,7 @@ function ProductList() {
               <label htmlFor={`cbx-${key}`} className="cbx" />
 
               <p>{product.sku}</p>
-              <p>Product: {product.name}</p>
+              <p className="name">Product: {product.name}</p>
               <p>Price: {product.price} $</p>
               <p>{getDescription(product)}</p>
               <div className="edit-delete">
