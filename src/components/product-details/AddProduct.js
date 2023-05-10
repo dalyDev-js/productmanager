@@ -22,15 +22,45 @@ function AddProducts() {
     price: "",
     attribute: "",
     value: "",
+    width: "",
+    height: "",
+    length: "",
+    weight: "",
+    size: "",
   });
   const [selectedOption, setSelectedOption] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessages, setErrorMessages] = useState({
+    sku: "",
+    name: "",
+    price: "",
+    attribute: "",
+    value: "",
+    height: "",
+    width: "",
+    length: "",
+    weight: "",
+    size: "",
+  });
 
-  //change handler
+  // change handler
   const handleChange = (event) => {
     const name = event.target.name;
     const value = event.target.value;
     setInputs((values) => ({ ...values, [name]: value }));
+    setErrorMessages((messages) => ({ ...messages, [name]: "" }));
+
+    if (name === "attribute") {
+      if (value === "Book") {
+        setInputs((values) => ({ ...values, value: inputs.weight }));
+      } else if (value === "DVD-Disk") {
+        setInputs((values) => ({ ...values, value: inputs.size }));
+      } else {
+        setInputs((values) => ({ ...values, value: "" }));
+      }
+    }
+
+    let formattedValue = value; // Initialize formattedValue with the input value
 
     if (selectedOption === "Furniture") {
       const dimensions = ["height", "width", "length"];
@@ -44,18 +74,19 @@ function AddProducts() {
       const dimensionValues = dimensions.map(
         (dimension) => updatedValues[dimension]
       );
-      const formattedValue = dimensionValues.join("x");
-
-      setInputs((values) => ({ ...values, value: formattedValue }));
-    } else if (selectedOption === "DVD-Disk" || selectedOption === "Book") {
-      setInputs((values) => ({ ...values, value: value }));
+      // Update formattedValue for Furniture
+      formattedValue = dimensionValues.join("x");
     }
+
+    setInputs((values) => ({ ...values, value: formattedValue }));
   };
+  // handle option change
   const handleOptionChange = (event) => {
     const name = event.target.name;
     const option = event.target.value;
     setSelectedOption(option);
     setInputs((values) => ({ ...values, [name]: option }));
+    setErrorMessages((messages) => ({ ...messages, [name]: "" }));
   };
 
   //handle submit
@@ -63,63 +94,119 @@ function AddProducts() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const config = {
-      method: "post",
-      url: "https://www.screen2script-mag.com/api/product/save",
+    // Input validation
+    const errorMessages = {};
 
-      data: {
-        sku: inputs.sku,
-        name: inputs.name,
-        price: inputs.price,
-        attribute: inputs.attribute,
-        value: inputs.value,
-      },
-    };
-    axios(config)
-      .then(function (response) {
-        console.log(response.config);
-        console.log(response.data);
+    if (!inputs.sku.trim()) {
+      errorMessages.sku = "Please provide SKU";
+    }
 
-        // clear inputs if success
-        if (
-          JSON.stringify(response.data) ===
-          JSON.stringify({ status: 1, message: "Data created." })
-        ) {
-          setInputs({
-            sku: "",
-            name: "",
-            price: "",
-            attribute: "",
-            value: "",
-            height: "",
-            width: "",
-            length: "",
-            weight: "",
-            size: "",
-          });
-          Navigate("/");
-        }
-        // if SKU already exist
-        if (
-          typeof response.data === "string" &&
-          (response.data.includes(
-            "Integrity constraint violation: 1048 Column 'SKU' cannot be null"
-          ) ||
-            response.data.includes(
-              "Integrity constraint violation: 1062 Duplicate entry"
-            ))
-        ) {
-          setErrorMessage("SKU already exists!");
-        } else {
-          setErrorMessage("");
-        }
-      })
-      .catch((err) => {
-        console.log(err.config);
-        console.log(err);
-      });
+    if (!inputs.name.trim()) {
+      errorMessages.name = "Please provide Name";
+    }
+
+    if (!inputs.price.trim()) {
+      errorMessages.price = "Please provide Price";
+    }
+
+    if (!inputs.attribute) {
+      errorMessages.attribute = "Please select a Type";
+    } else {
+      switch (selectedOption) {
+        case "Furniture":
+          if (!inputs.height.trim()) {
+            errorMessages.height = "Please provide Height";
+          }
+          if (!inputs.width.trim()) {
+            errorMessages.width = "Please provide Width";
+          }
+          if (!inputs.length.trim()) {
+            errorMessages.length = "Please provide Length";
+          }
+          break;
+
+        case "Book":
+          if (!inputs.weight.trim()) {
+            errorMessages.value = "Please provide weight in KG";
+          }
+          break;
+
+        case "DVD-Disk":
+          if (!inputs.size.trim()) {
+            errorMessages.value = "Please provide Size in MB";
+          }
+          break;
+
+        default:
+          break;
+      }
+    }
+    setErrorMessages(errorMessages);
+
+    // Check if there are any error messages
+    const hasErrors = Object.values(errorMessages).some(
+      (message) => message !== ""
+    );
+
+    if (!hasErrors) {
+      const config = {
+        method: "post",
+        url: "https://www.screen2script-mag.com/api/product/save",
+        data: {
+          sku: inputs.sku,
+          name: inputs.name,
+          price: inputs.price,
+          attribute: inputs.attribute,
+          value: inputs.value,
+        },
+      };
+
+      axios(config)
+        .then(function (response) {
+          console.log(response.config);
+          console.log(response.data);
+
+          // clear inputs if success
+          if (
+            JSON.stringify(response.data) ===
+            JSON.stringify({ status: 1, message: "Data created." })
+          ) {
+            setInputs({
+              sku: "",
+              name: "",
+              price: "",
+              attribute: "",
+              value: "",
+              height: "",
+              width: "",
+              length: "",
+              weight: "",
+              size: "",
+            });
+            Navigate("/");
+          }
+
+          // if SKU already exists
+          if (
+            typeof response.data === "string" &&
+            (response.data.includes(
+              "Integrity constraint violation: 1048 Column 'SKU' cannot be null"
+            ) ||
+              response.data.includes(
+                "Integrity constraint violation: 1062 Duplicate entry"
+              ))
+          ) {
+            setErrorMessage("SKU already exists!");
+          } else {
+            setErrorMessage("");
+          }
+        })
+        .catch((err) => {
+          console.log(err.config);
+          console.log(err);
+        });
+    }
   };
-
   return (
     <>
       <header className="addheader">
@@ -133,7 +220,7 @@ function AddProducts() {
         <h1>Add Product {inputs.sku}</h1>
       </header>
       <div className="addcontainer">
-        <div className="card">
+        <div className="">
           <form id="product_form" onSubmit={handleSubmit} className="form">
             <div className="lables">
               <label>SKU </label>
@@ -144,10 +231,15 @@ function AddProducts() {
                 placeholder=""
                 value={inputs.sku}
                 onChange={handleChange}
-                required
+                onKeyDown={(e) => {
+                  if (e.key === " " || e.key === "Spacebar") e.preventDefault();
+                }}
               />
               {errorMessage && (
                 <span className="error-message">{errorMessage}</span>
+              )}
+              {errorMessages.sku && (
+                <span className="error-message">{errorMessages.sku}</span>
               )}
             </div>
 
@@ -160,8 +252,10 @@ function AddProducts() {
                 placeholder=""
                 value={inputs.name}
                 onChange={handleChange}
-                required
               />
+              {errorMessages.name && (
+                <span className="error-message">{errorMessages.name}</span>
+              )}
             </div>
             <div className="lables">
               <label>Price ($)</label>
@@ -172,8 +266,10 @@ function AddProducts() {
                 placeholder=""
                 value={inputs.price}
                 onChange={handleChange}
-                required
               />
+              {errorMessages.price && (
+                <span className="error-message">{errorMessages.price}</span>
+              )}
             </div>
             <div className="lables">
               <label>Type switcher</label>
@@ -182,7 +278,6 @@ function AddProducts() {
                 name="attribute"
                 value={inputs.attribute}
                 onChange={handleOptionChange}
-                required
               >
                 <option hidden></option>
                 {selectedOptions.map((option) => (
@@ -196,13 +291,16 @@ function AddProducts() {
                   </option>
                 ))}
               </select>
+              {errorMessages.attribute && (
+                <span className="error-message">{errorMessages.attribute}</span>
+              )}
             </div>
+
             {selectedOption === "Furniture" && (
               <>
                 <div className="lables">
                   <label>Height (cm)</label>
                   <input
-                    required
                     id="height"
                     type="number"
                     name="height"
@@ -210,32 +308,46 @@ function AddProducts() {
                     placeholder=""
                     onChange={handleChange}
                   />
+
+                  {errorMessages.height && (
+                    <span className="error-message">
+                      {errorMessages.height}
+                    </span>
+                  )}
                 </div>
                 <div className="lables">
                   <label>Width (cm)</label>
                   <input
                     id="width"
-                    required
                     type="number"
                     name="width"
                     value={inputs.width}
                     placeholder=""
                     onChange={handleChange}
                   />
+                  {errorMessages.width && (
+                    <span className="error-message">{errorMessages.width}</span>
+                  )}
                 </div>
                 <div className="lables">
                   <label>Length (cm)</label>
                   <input
                     id="length"
-                    required
                     type="number"
                     name="length"
                     value={inputs.length}
                     placeholder=""
                     onChange={handleChange}
                   />
+                  {errorMessages.length && (
+                    <span className="error-message">
+                      {errorMessages.length}
+                    </span>
+                  )}
                 </div>
-                <span>Please provide dimensions in HxWxL format</span>
+                <span className="format-text">
+                  Please provide dimensions in HxWxL format
+                </span>
               </>
             )}
             {selectedOption === "Book" && (
@@ -243,7 +355,6 @@ function AddProducts() {
                 <div className="lables">
                   <label>Weight (KG)</label>
                   <input
-                    required
                     id="weight"
                     type="number"
                     name="weight"
@@ -251,8 +362,12 @@ function AddProducts() {
                     placeholder=""
                     onChange={handleChange}
                   />
+
+                  {errorMessages.value && (
+                    <span className="error-message">{errorMessages.value}</span>
+                  )}
                 </div>
-                <span>Please provide weight in KG</span>
+                <span className="format-text">Please provide weight in KG</span>
               </>
             )}
             {selectedOption === "DVD-Disk" && (
@@ -260,7 +375,6 @@ function AddProducts() {
                 <div className="lables">
                   <label>Size (MB)</label>
                   <input
-                    required
                     id="size"
                     type="number"
                     name="size"
@@ -268,8 +382,12 @@ function AddProducts() {
                     placeholder=""
                     onChange={handleChange}
                   />
+
+                  {errorMessages.value && (
+                    <span className="error-message">{errorMessages.value}</span>
+                  )}
                 </div>
-                <span>Please provide Size in Mb</span>
+                <span className="format-text">Please provide Size in Mb</span>
               </>
             )}
 
