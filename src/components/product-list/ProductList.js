@@ -8,25 +8,22 @@ import { AiFillEdit, AiOutlinePlus } from "react-icons/ai";
 
 function ProductList() {
   const [products, setProducts] = useState([]);
+  const [checked, setChecked] = useState({});
 
   useEffect(() => {
     getUsers();
   }, []);
 
   function getUsers() {
-    axios
-      .get("https://www.screen2script-mag.com/api/products")
-      .then(function (response) {
-        console.log(response.data);
-        setProducts(response.data);
-      });
+    axios.get("http://localhost/api/products").then(function (response) {
+      console.log(response.data);
+      setProducts(response.data);
+    });
   }
 
   const deleteProducts = (SKUsToDelete) => {
     const deletePromises = SKUsToDelete.map((sku) =>
-      axios.delete(
-        `https://www.screen2script-mag.com/api/product/${sku}/delete`
-      )
+      axios.delete(`http://localhost/api/product/${sku}/delete`)
     );
 
     Promise.all(deletePromises).then(function (responses) {
@@ -36,24 +33,22 @@ function ProductList() {
   };
 
   const handleDeleteChecked = () => {
-    const checkedProducts = products.filter((product) => product.checked);
+    const checkedProducts = products.filter((product) => checked[product.sku]);
     const SKUsToDelete = checkedProducts.map((product) => product.sku);
     deleteProducts(SKUsToDelete);
   };
 
   const handleCheckboxChange = (event, sku) => {
-    const updatedProducts = products.map((product) => {
-      if (product.sku === sku) {
-        return { ...product, checked: event.target.checked };
-      }
-      return product;
-    });
-    setProducts(updatedProducts);
+    const isChecked = event.target.checked;
+    setChecked((prevChecked) => ({
+      ...prevChecked,
+      [sku]: isChecked,
+    }));
   };
 
   const deleteProduct = (sku) => {
     axios
-      .delete(`https://www.screen2script-mag.com/api/product/${sku}/delete`)
+      .delete(`http://localhost/api/product/${sku}/delete`)
       .then(function (response) {
         console.log(response.data);
         getUsers();
@@ -83,12 +78,8 @@ function ProductList() {
           </Link>
         </div>
         <div className="buttons">
-          <Link to="add-product">
-            {/* <AiOutlinePlus/> */}
-            ADD
-          </Link>
+          <Link to="add-product">ADD</Link>
           <button id="delete-product-btn" onClick={handleDeleteChecked}>
-            {/* <FaTrash />  */}
             MASS DELETE
           </button>
         </div>
@@ -108,7 +99,7 @@ function ProductList() {
                 className="delete-checkbox"
                 type="checkbox"
                 id={`cbx-${key}`}
-                checked={product.checked || false}
+                checked={checked[product.sku] || false}
                 onChange={(event) => handleCheckboxChange(event, product.sku)}
               />
               <label htmlFor={`cbx-${key}`} className="cbx" />
