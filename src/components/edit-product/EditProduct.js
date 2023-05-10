@@ -35,7 +35,7 @@ function EditProduct() {
     getProduct();
   }, []);
   function getProduct() {
-    axios.get(`http://localhost/api/product/${sku}`).then(function (response) {
+    axios.get(`https://www.screen2script-mag.com/api/product/${sku}`).then(function (response) {
       setInputs(response.data);
       setAttributeInput(response.data.attribute);
       setSelectedOption(response.data.attribute);
@@ -106,7 +106,7 @@ function EditProduct() {
     event.preventDefault();
     console.log(inputs);
     axios
-      .put(`http://localhost/api/product/${sku}/edit`, inputs)
+      .put(`https://www.screen2script-mag.com/api/product/${sku}/edit`, inputs)
       .then(function (response) {
         console.log(response.data);
 
