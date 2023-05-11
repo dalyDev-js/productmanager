@@ -231,15 +231,9 @@ function AddProducts() {
                 placeholder=""
                 value={inputs.sku}
                 onChange={handleChange}
-                onKeyDown={(e) => {
-                  if (
-                    (e.key === " " ||
-                      e.key === "Spacebar" ||
-                      e.key.match(/[A-Z!@#$%^&*()+\-=_]/)) &&
-                    e.key !== "Backspace" &&
-                    e.key !== "Delete"
-                  ) {
-                    e.preventDefault( );
+              onKeyDown={(e) => {
+                  if (e.key === " " || e.key === "Spacebar") {
+                    e.preventDefault();
                   }
                 }}
               />
