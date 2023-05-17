@@ -47,6 +47,9 @@ function EditProduct() {
   useEffect(() => {
     getProduct();
   }, []);
+  useEffect(() => {
+    console.log(inputs);
+  }, [inputs]);
   const { sku } = useParams();
 
   function getProduct() {
@@ -54,36 +57,46 @@ function EditProduct() {
       .get(`https://www.screen2script-mag.com/api/products/${sku}`)
       .then(function (response) {
         console.log(response.data);
-        setInputs(response.data);
-        setAttributeInput(response.data.attribute);
-        setSelectedOption(response.data.attribute);
 
         if (response.data.attribute === "Furniture") {
           const dimensions = response.data.value.split("x");
           if (dimensions.length === 3) {
-            setInputs((values) => ({
-              ...values,
+            setInputs((prevInputs) => ({
+              ...prevInputs,
+              sku: response.data.sku,
+              name: response.data.name,
+              price: response.data.price,
+              attribute: response.data.attribute,
+              value: response.data.value,
               height: dimensions[0],
               width: dimensions[1],
               length: dimensions[2],
-              value: response.data.value, // Set value to the original value
             }));
           }
         } else if (response.data.attribute === "DVD-Disk") {
-          setInputs((values) => ({
-            ...values,
+          setInputs((prevInputs) => ({
+            ...prevInputs,
+            sku: response.data.sku,
+            name: response.data.name,
+            price: response.data.price,
+            attribute: response.data.attribute,
+            value: response.data.value,
             size: response.data.value,
-            value: response.data.value, // Set value to the original value
           }));
         } else if (response.data.attribute === "Book") {
-          setInputs((values) => ({
-            ...values,
+          setInputs((prevInputs) => ({
+            ...prevInputs,
+            sku: response.data.sku,
+            name: response.data.name,
+            price: response.data.price,
+            attribute: response.data.attribute,
+            value: response.data.value,
             weight: response.data.value,
-            value: response.data.value, // Set value to the original value
           }));
         }
       });
   }
+
   //CHANGE HANDLE
   const handleChange = (event) => {
     const name = event.target.name;
@@ -105,16 +118,19 @@ function EditProduct() {
       if (value === "Book") {
         setInputs((prevInputs) => ({
           ...prevInputs,
+          attribute: value,
           value: prevInputs.weight, // Set the value to weight
         }));
       } else if (value === "DVD-Disk") {
         setInputs((values) => ({
           ...values,
+          attribute: value,
           value: values.size, // Set the value to size
         }));
       } else {
         setInputs((values) => ({
           ...values,
+          attribute: value,
           value: "", // Clear the value
         }));
       }
@@ -147,6 +163,7 @@ function EditProduct() {
         value: value,
       }));
     }
+
     // Update value for Book
     if (name === "weight" && selectedOption === "Book") {
       setInputs((prevInputs) => ({
@@ -156,12 +173,20 @@ function EditProduct() {
     }
   };
 
-  // handle option change
   const handleOptionChange = (event) => {
     const name = event.target.name;
     const option = event.target.value;
     setSelectedOption(option);
-    setInputs((values) => ({ ...values, [name]: option }));
+    setInputs((values) => ({
+      ...values,
+      attribute: option,
+      value: "", // Clear the value when the attribute changes
+      height: "",
+      width: "",
+      length: "",
+      weight: "", // Clear the weight field
+      size: "", // Clear the size field
+    }));
     setErrorMessages((messages) => ({ ...messages, [name]: "" }));
   };
 
