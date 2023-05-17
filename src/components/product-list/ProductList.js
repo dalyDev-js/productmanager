@@ -8,6 +8,7 @@ import { AiFillEdit, AiOutlinePlus } from "react-icons/ai";
 
 function ProductList() {
   const [products, setProducts] = useState([]);
+  const [checked, setChecked] = useState({});
 
   useEffect(() => {
     getUsers();
@@ -18,42 +19,66 @@ function ProductList() {
       .get("https://www.screen2script-mag.com/api/products")
       .then(function (response) {
         console.log(response.data);
-        setProducts(response.data);
+        if (
+          JSON.stringify(response.data) ===
+          JSON.stringify({ message: "No products found." })
+        ) {
+          setProducts([]);
+        } else {
+          setProducts(response.data);
+        }
       });
   }
 
   const deleteProducts = (SKUsToDelete) => {
-    const deletePromises = SKUsToDelete.map((sku) =>
-      axios.delete(
-        `https://www.screen2script-mag.com/api/product/${sku}/delete`
-      )
-    );
+    const deletePromises = SKUsToDelete.map((sku) => {
+      const productToDelete = products.find((product) => product.sku === sku);
+      const { attribute } = productToDelete;
 
-    Promise.all(deletePromises).then(function (responses) {
-      console.log(responses.map((response) => response.data));
-      getUsers();
+      console.log("Attribute:", attribute);
+
+      return axios.delete(
+        `https://www.screen2script-mag.com/api/product/${sku}/delete`,
+        {
+          data: { attribute },
+        }
+      );
     });
+
+    Promise.all(deletePromises)
+      .then(function (responses) {
+        console.log(responses.map((response) => response.data));
+        getUsers();
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   };
 
   const handleDeleteChecked = () => {
-    const checkedProducts = products.filter((product) => product.checked);
+    const checkedProducts = products.filter((product) => checked[product.sku]);
     const SKUsToDelete = checkedProducts.map((product) => product.sku);
     deleteProducts(SKUsToDelete);
   };
 
   const handleCheckboxChange = (event, sku) => {
-    const updatedProducts = products.map((product) => {
-      if (product.sku === sku) {
-        return { ...product, checked: event.target.checked };
-      }
-      return product;
-    });
-    setProducts(updatedProducts);
+    const isChecked = event.target.checked;
+    setChecked((prevChecked) => ({
+      ...prevChecked,
+      [sku]: isChecked,
+    }));
   };
 
   const deleteProduct = (sku) => {
+    const productToDelete = products.find((product) => product.sku === sku);
+    const { attribute } = productToDelete;
+
+    console.log("Attribute:", attribute);
+
     axios
-      .delete(`https://www.screen2script-mag.com/api/product/${sku}/delete`)
+      .delete(`https://www.screen2script-mag.com/api/product/${sku}/delete`, {
+        data: { attribute },
+      })
       .then(function (response) {
         console.log(response.data);
         getUsers();
@@ -83,12 +108,8 @@ function ProductList() {
           </Link>
         </div>
         <div className="buttons">
-          <Link to="add-product">
-            {/* <AiOutlinePlus/> */}
-            ADD
-          </Link>
+          <Link to="add-product">ADD</Link>
           <button id="delete-product-btn" onClick={handleDeleteChecked}>
-            {/* <FaTrash />  */}
             MASS DELETE
           </button>
         </div>
@@ -108,7 +129,7 @@ function ProductList() {
                 className="delete-checkbox"
                 type="checkbox"
                 id={`cbx-${key}`}
-                checked={product.checked || false}
+                checked={checked[product.sku] || false}
                 onChange={(event) => handleCheckboxChange(event, product.sku)}
               />
               <label htmlFor={`cbx-${key}`} className="cbx" />
