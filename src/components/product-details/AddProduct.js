@@ -103,6 +103,11 @@ function AddProducts() {
 
     if (!inputs.name.trim()) {
       errorMessages.name = "Please provide Name";
+    } else if (/\d/.test(inputs.name)) {
+      setInputs((prevInputs) => ({
+        ...prevInputs,
+        name: inputs.name.replace(/\d/g, ""),
+      }));
     }
 
     if (!inputs.price.trim()) {
@@ -188,13 +193,8 @@ function AddProducts() {
 
           // if SKU already exists
           if (
-            typeof response.data === "string" &&
-            (response.data.includes(
-              "Integrity constraint violation: 1048 Column 'SKU' cannot be null"
-            ) ||
-              response.data.includes(
-                "Integrity constraint violation: 1062 Duplicate entry"
-              ))
+            JSON.stringify(response.data) ===
+            JSON.stringify({ status: 0, message: "Non-unique SKU entered." })
           ) {
             setErrorMessage("SKU already exists!");
           } else {
@@ -205,6 +205,9 @@ function AddProducts() {
           console.log(err.config);
           console.log(err);
         });
+    }
+    if (!inputs.sku.trim()) {
+      errorMessages.sku = "Please provide SKU";
     }
   };
   return (
@@ -231,7 +234,7 @@ function AddProducts() {
                 placeholder=""
                 value={inputs.sku}
                 onChange={handleChange}
-              onKeyDown={(e) => {
+                onKeyDown={(e) => {
                   if (e.key === " " || e.key === "Spacebar") {
                     e.preventDefault();
                   }
